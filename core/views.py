@@ -10,10 +10,10 @@ def contato(request):
 
     if str(request.method) == 'POST':
         if form.is_valid():
-            nome = form.changed_data['nome']
-            email = form.changed_data['email']
-            assunto = form.changed_data['assunto']
-            mensagem = form.changed_data['mensagem']
+            nome = form.cleaned_data['nome']
+            email = form.cleaned_data['email']
+            assunto = form.cleaned_data['assunto']
+            mensagem = form.cleaned_data['mensagem']
 
             print('Mensagem enviada')
             print(f'Nome: {nome}')
@@ -21,7 +21,7 @@ def contato(request):
             print(f'Assunto: {assunto}')
             print(f'Mensagem: {mensagem}')
 
-            messages.sucess(request, 'Email enviado com sucesso!')
+            messages.success(request, 'Email enviado com sucesso!')
             form = contatoForm()
 
         else:
