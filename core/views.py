@@ -1,5 +1,7 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib import messages
+from django.shortcuts import redirect
 
 from .forms import contatoForm, ProdutoModelForm
 from .models import Produto
@@ -10,6 +12,7 @@ def index(request):
         'produtos': Produto.objects.all()
     }
     return render(request, 'index.html', context)
+
 
 def contato(request):
     form = contatoForm(request.POST or None)
@@ -38,19 +41,23 @@ def contato(request):
     }
     return render(request, 'contato.html', context)
 
-def produto(request):
-    if str(request.method) == 'POST':
-        form = ProdutoModelForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
 
-            messages.success(request, 'Produto salvo com sucesso')
-            form = ProdutoModelForm()
+def produto(request):
+    if str(request.user) != 'AnonymousUser':
+        if str(request.method) == 'POST':
+            form = ProdutoModelForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+
+                messages.success(request, 'Produto salvo com sucesso')
+                form = ProdutoModelForm()
+            else:
+                messages.error(request, 'Erro ao salvar produto')
         else:
-            messages.error(request, 'Erro ao salvar produto')
+            form = ProdutoModelForm()
+        context = {
+            'form': form
+        }
+        return render(request, 'produto.html', context)
     else:
-        form = ProdutoModelForm()
-    context = {
-        'form': form
-    }
-    return render(request, 'produto.html', context)
+        return redirect('index')
